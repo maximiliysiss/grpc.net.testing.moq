@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "env", "env", "{7E21EE01-9EB7-46A9-92E6-EE565A6D6DEA}"
 ProjectSection(SolutionItems) = preProject
 	..\README.md = ..\README.md
+	..\.github\workflows\dotnet.yml = ..\.github\workflows\dotnet.yml
 EndProjectSection
 EndProject
 Global
