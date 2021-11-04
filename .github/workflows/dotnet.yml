@@ -23,6 +23,11 @@ jobs:
       run: dotnet build --no-restore src/Grpc.Net.Testing.Moq/
     - name: Test
       run: dotnet test --no-build --verbosity normal src/Grpc.Net.Testing.Moq/
+    
+  nuget:
+    runs-on: ubuntu-latest
+    
+    steps:
     - name: Nuget Publish
       uses: brandedoutcast/publish-nuget@v2.5.5
       with:
