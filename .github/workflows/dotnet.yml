@@ -41,9 +41,11 @@ jobs:
     needs: test
     
     steps:
+    - uses: actions/checkout@v2
     - name: Nuget Publish
-      uses: brandedoutcast/publish-nuget@v2.5.5
+      uses: rohith/publish-nuget@v2
       with:
-        PROJECT_FILE_PATH: ./src/Grpc.Net.Testing.Moq/Grpc.Net.Testing.Moq.csproj
+        PROJECT_FILE_PATH: src/Grpc.Net.Testing.Moq/Grpc.Net.Testing.Moq.csproj
         PACKAGE_NAME: Grpc.Net.Testing.Moq
-        NUGET_KEY: $NUGET_API
+        NUGET_KEY: ${{secrets.NUGET_API}}
+        VERSION_STATIC: 1.0.0
