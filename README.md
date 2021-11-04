@@ -1,5 +1,7 @@
 # grpc.net.testing.moq
 
+[![.NET](https://github.com/maximiliysiss/grpc.net.testing.moq/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/maximiliysiss/grpc.net.testing.moq/actions/workflows/dotnet.yml)
+
 Library to mocking gRPC client. Instead of `Grpc.Core.Testing` using extensions for `Moq`
 
 Based on libraries:

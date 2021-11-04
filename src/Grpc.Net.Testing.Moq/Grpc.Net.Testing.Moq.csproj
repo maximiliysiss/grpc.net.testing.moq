@@ -2,6 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <Title>Net.Grpc.Testing.Moq</Title>
+        <PackageTags>gRPC Moq</PackageTags>
+        <Description>Library to mocking gRPC client. Instead of Grpc.Core.Testing using extensions for Moq</Description>
+        <PackageProjectUrl>https://github.com/maximiliysiss/grpc.net.testing.moq</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/maximiliysiss/grpc.net.testing.moq</RepositoryUrl>
+        <PackageId>Net.Grpc.Testing.Moq</PackageId>
+        <Authors>Net.Grpc.Testing.Moq</Authors>
     </PropertyGroup>
 
     <ItemGroup>
