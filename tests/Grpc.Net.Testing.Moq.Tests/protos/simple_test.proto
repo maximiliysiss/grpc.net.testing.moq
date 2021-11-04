@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option csharp_namespace = "Grpc.Net.Testing.Moq.Tests.Proto";
+
+package tests;
+
+service TestService {
+  rpc Simple(TestRequest) returns(TestResponse);
+  rpc SimpleClientStream(stream TestRequest) returns(TestResponse);
+  rpc SimpleServerStream(TestRequest) returns(stream TestResponse);
+  rpc SimpleClientServerStream(stream TestRequest) returns(stream TestResponse);
+}
+
+message TestRequest{}
+message TestResponse{}

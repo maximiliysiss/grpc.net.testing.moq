@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Grpc.Core.Testing" Version="2.41.1" />
+      <PackageReference Include="Moq" Version="4.16.1" />
+    </ItemGroup>
+
+</Project>
