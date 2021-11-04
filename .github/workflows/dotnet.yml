@@ -48,4 +48,3 @@ jobs:
         PROJECT_FILE_PATH: src/Grpc.Net.Testing.Moq/Grpc.Net.Testing.Moq.csproj
         PACKAGE_NAME: Net.Testing.Moq.Grpc
         NUGET_KEY: ${{secrets.NUGET_API}}
-        VERSION_STATIC: 1.0.1
