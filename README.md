@@ -13,7 +13,7 @@ Based on libraries:
 
 ### Nuget:
 
-`Install-Package Net.Testing.Moq.Grpc -Version 1.0.1`
+`Install-Package Net.Testing.Moq.Grpc`
 
 ## Using example
 
