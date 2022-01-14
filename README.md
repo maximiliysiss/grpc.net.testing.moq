@@ -100,7 +100,7 @@ var testResponse = new[]{ new TestResponse() };
 // Setup and set responses like second argument (params TResponse[] responses)
 grpcMock
     .Setup(c => c.SimpleClientServerStream(null, null, default))
-    .Returns;
+    .Returns(testResponse);
 
 var client = grpcMock.Object;
 
