@@ -35,7 +35,9 @@ var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new TestResponse();
 
 // Setup and set response like second argument
-grpcMock.Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default), testResponse);
+grpcMock
+    .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+    .Returns(testResponse);
 
 var client = grpcMock.Object;
 
@@ -51,7 +53,9 @@ var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new TestResponse();
 
 // Setup and set response like second argument
-grpcMock.Setup(c => c.SimpleClientStream(null, null, default), testResponse);
+grpcMock
+    .Setup(c => c.SimpleClientStream(null, null, default))
+    .Returns(testResponse);
 
 var client = grpcMock.Object;
 
@@ -66,10 +70,12 @@ var response = await stream;
 ```c#
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
-var testResponse = new TestResponse();
+var testResponse = new[]{ new TestResponse() };
 
 // Setup and set responses like second argument (params TResponse[] responses)
-grpcMock.Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default), testResponse);
+grpcMock
+    .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+    .Returns(testResponse);
 
 var client = grpcMock.Object;
 
@@ -83,10 +89,12 @@ var responses = stream.ResponseStream.ReadAllAsync();
 ```c#
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
-var testResponse = new TestResponse();
+var testResponse = new[]{ new TestResponse() };
 
 // Setup and set responses like second argument (params TResponse[] responses)
-grpcMock.Setup(c => c.SimpleClientServerStream(null, null, default), testResponse);
+grpcMock
+    .Setup(c => c.SimpleClientServerStream(null, null, default))
+    .Returns;
 
 var client = grpcMock.Object;
 

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Grpc.Core;
@@ -11,7 +14,7 @@ namespace Grpc.Net.Testing.Moq.Tests
     public class GrpcMoqTests
     {
         [Fact]
-        public void Simple_ShouldReturnResponse_ByTestRequest()
+        public void Simple_ShouldReturnResponse()
         {
             // Arrange 
             var grpcMock = new Mock<TestService.TestServiceClient>();
@@ -29,13 +32,15 @@ namespace Grpc.Net.Testing.Moq.Tests
         }
 
         [Fact]
-        public async Task SimpleAsync_ShouldReturnResponse_ByTestRequest()
+        public async Task SimpleAsync_ShouldReturnResponse()
         {
             // Arrange 
             var grpcMock = new Mock<TestService.TestServiceClient>();
             var testResponse = new TestResponse();
 
-            grpcMock.Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default), testResponse);
+            grpcMock
+                .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+                .Returns(testResponse);
 
             var client = grpcMock.Object;
 
@@ -54,7 +59,9 @@ namespace Grpc.Net.Testing.Moq.Tests
             var grpcMock = new Mock<TestService.TestServiceClient>();
             var testResponse = new TestResponse();
 
-            grpcMock.Setup(c => c.SimpleClientStream(null, null, default), testResponse);
+            grpcMock
+                .Setup(c => c.SimpleClientStream(null, null, default))
+                .Returns(testResponse);
 
             var client = grpcMock.Object;
 
@@ -67,13 +74,15 @@ namespace Grpc.Net.Testing.Moq.Tests
         }
 
         [Fact]
-        public async Task SimpleClientStream_ShouldReturnResponse_ByTestRequest()
+        public async Task SimpleClientStream_ShouldReturnResponse()
         {
             // Arrange 
             var grpcMock = new Mock<TestService.TestServiceClient>();
             var testResponse = new TestResponse();
 
-            grpcMock.Setup(c => c.SimpleClientStream(null, null, default), testResponse);
+            grpcMock
+                .Setup(c => c.SimpleClientStream(null, null, default))
+                .Returns(testResponse);
 
             var client = grpcMock.Object;
 
@@ -87,65 +96,87 @@ namespace Grpc.Net.Testing.Moq.Tests
             response.Should().BeSameAs(testResponse);
         }
 
-        [Fact]
-        public async Task SimpleServerStream_ShouldReturnResponse_ByTestRequest()
+        [Theory]
+        [MemberData(nameof(SampleData))]
+        public async Task SimpleServerStream_ShouldReturnResponse(TestResponse[] testResponse)
         {
             // Arrange 
             var grpcMock = new Mock<TestService.TestServiceClient>();
-            var testResponse = new TestResponse();
 
-            grpcMock.Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default), testResponse);
+            grpcMock
+                .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+                .Returns(testResponse);
 
             var client = grpcMock.Object;
 
             // Act
             var stream = client.SimpleServerStream(new TestRequest());
-            var responses = stream.ResponseStream.ReadAllAsync();
 
             // Assert
-            await foreach (var response in responses)
+            var responses = await stream.ResponseStream.ReadAllAsync().ToArrayAsync();
+
+            responses.Should().HaveCount(testResponse.Length);
+
+            foreach (var response in responses)
                 response.Should().NotBeNull();
         }
 
-        [Fact]
-        public async Task SimpleClientServerStream_ShouldReturnResponse_ByEmptyTestRequest()
+        [Theory]
+        [MemberData(nameof(SampleData))]
+        public async Task SimpleClientServerStream_ShouldReturnResponse_ByEmptyTestRequest(TestResponse[] testResponse)
         {
             // Arrange 
             var grpcMock = new Mock<TestService.TestServiceClient>();
-            var testResponse = new TestResponse();
 
-            grpcMock.Setup(c => c.SimpleClientServerStream(null, null, default), testResponse);
+            grpcMock
+                .Setup(c => c.SimpleClientServerStream(null, null, default))
+                .Returns(testResponse);
 
             var client = grpcMock.Object;
 
             // Act
             var stream = client.SimpleClientServerStream();
-            var responses = stream.ResponseStream.ReadAllAsync();
 
             // Assert
-            await foreach (var response in responses)
+            var responses = await stream.ResponseStream.ReadAllAsync().ToArrayAsync();
+
+            responses.Should().HaveCount(testResponse.Length);
+
+            foreach (var response in responses)
                 response.Should().NotBeNull();
         }
 
-        [Fact]
-        public async Task SimpleClientServerStream_ShouldReturnResponse_ByTestRequest()
+        [Theory]
+        [MemberData(nameof(SampleData))]
+        public async Task SimpleClientServerStream_ShouldReturnResponse(TestResponse[] testResponse)
         {
             // Arrange 
             var grpcMock = new Mock<TestService.TestServiceClient>();
-            var testResponse = new TestResponse();
 
-            grpcMock.Setup(c => c.SimpleClientServerStream(null, null, default), testResponse);
+            grpcMock
+                .Setup(c => c.SimpleClientServerStream(null, null, default))
+                .Returns(testResponse);
 
             var client = grpcMock.Object;
 
             // Act
             var stream = client.SimpleClientServerStream();
             await stream.RequestStream.WriteAsync(new TestRequest());
-            var responses = stream.ResponseStream.ReadAllAsync();
 
             // Assert
-            await foreach (var response in responses)
+            var responses = await stream.ResponseStream.ReadAllAsync().ToArrayAsync();
+
+            responses.Should().HaveCount(testResponse.Length);
+
+            foreach (var response in responses)
                 response.Should().NotBeNull();
+        }
+
+        public static IEnumerable<object[]> SampleData()
+        {
+            yield return new object[] {Array.Empty<TestResponse>()};
+            yield return new object[] {new[] {new TestResponse()}};
+            yield return new object[] {new[] {new TestResponse(), new TestResponse()}};
         }
     }
 }

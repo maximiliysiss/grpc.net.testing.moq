@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -11,68 +12,74 @@ namespace Grpc.Net.Testing.Moq
 {
     public static class GrpcMoqExtensions
     {
-        public static ISetup<T, TResult> Setup<T, TResult>(this Mock<T> mock, Expression<Func<T, TResult>> expression)
-            where T : class
-            => mock.Setup(expression);
-
-        public static IReturnsResult<T> Setup<T, TResponse>(
-            this Mock<T> mock,
-            Expression<Func<T, AsyncUnaryCall<TResponse>>> expression,
+        public static IReturnsResult<T> Returns<T, TResponse>(
+            this ISetup<T, AsyncUnaryCall<TResponse>> setup,
             TResponse response)
+            where T : class
+            => setup.Returns(() => response);
+
+        public static IReturnsResult<T> Returns<T, TResponse>(
+            this ISetup<T, AsyncUnaryCall<TResponse>> setup,
+            Func<TResponse> responseFunc)
             where T : class
         {
             var fakeCall = TestCalls.AsyncUnaryCall(
-                Task.FromResult(response),
+                Task.FromResult(responseFunc()),
                 Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
                 () => new Metadata(),
                 () => { });
 
-            return mock
-                .Setup(expression)
-                .Returns(fakeCall);
+            return setup.Returns(fakeCall);
         }
 
-        public static IReturnsResult<T> Setup<T, TRequest, TResponse>(
-            this Mock<T> mock,
-            Expression<Func<T, AsyncClientStreamingCall<TRequest, TResponse>>> expression,
+        public static IReturnsResult<T> Returns<T, TRequest, TResponse>(
+            this ISetup<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
             TResponse response)
+            where T : class
+            => setup.Returns(() => response);
+
+        public static IReturnsResult<T> Returns<T, TRequest, TResponse>(
+            this ISetup<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
+            Func<TResponse> responseFunc)
             where T : class
         {
             var mockRequestStream = new Mock<IClientStreamWriter<TRequest>>();
 
             var fakeCall = TestCalls.AsyncClientStreamingCall(
                 mockRequestStream.Object,
-                Task.FromResult(response),
+                Task.FromResult(responseFunc()),
                 Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
                 () => new Metadata(), () => { });
 
-            return mock.Setup(expression).Returns(fakeCall);
+            return setup.Returns(fakeCall);
         }
 
-        public static IReturnsResult<T> Setup<T, TResponse>(
-            this Mock<T> mock,
-            Expression<Func<T, AsyncServerStreamingCall<TResponse>>> expression,
-            params TResponse[] responses)
+        public static IReturnsResult<T> Returns<T, TResponse>(
+            this ISetup<T, AsyncServerStreamingCall<TResponse>> setup,
+            IEnumerable<TResponse> responses)
+            where T : class
+            => setup.Returns(() => responses);
+
+        public static IReturnsResult<T> Returns<T, TResponse>(
+            this ISetup<T, AsyncServerStreamingCall<TResponse>> setup,
+            Func<IEnumerable<TResponse>> responsesFunc)
             where T : class
         {
             var mockResponseStream = new Mock<IAsyncStreamReader<TResponse>>();
+            var responses = responsesFunc();
 
-            for (var i = 0; i < responses.Length; i++)
+            var sequentialCurrent = mockResponseStream.SetupSequence(s => s.Current);
+            var sequentialMoveNext = mockResponseStream.SetupSequence(s => s.MoveNext(It.IsAny<CancellationToken>()));
+
+            foreach (var response in responses.ToArray())
             {
-                mockResponseStream.SetupSequence(s => s.Current).Returns(responses[i]);
-                mockResponseStream
-                    .SetupSequence(s => s.MoveNext(It.IsAny<CancellationToken>()))
-                    .Returns(Task.FromResult(i < responses.Length - 1));
+                sequentialCurrent.Returns(response);
+                sequentialMoveNext.Returns(Task.FromResult(true));
             }
 
-            if (responses.Length == 0)
-            {
-                mockResponseStream
-                    .SetupSequence(s => s.MoveNext(It.IsAny<CancellationToken>()))
-                    .Returns(Task.FromResult(false));
-            }
+            sequentialMoveNext.Returns(Task.FromResult(false));
 
             var fakeCall = TestCalls.AsyncServerStreamingCall(
                 mockResponseStream.Object,
@@ -81,32 +88,35 @@ namespace Grpc.Net.Testing.Moq
                 () => new Metadata(),
                 () => { });
 
-            return mock.Setup(expression).Returns(fakeCall);
+            return setup.Returns(fakeCall);
         }
 
-        public static IReturnsResult<T> Setup<T, TRequest, TResponse>(
-            this Mock<T> mock,
-            Expression<Func<T, AsyncDuplexStreamingCall<TRequest, TResponse>>> expression,
-            params TResponse[] responses)
+        public static IReturnsResult<T> Returns<T, TRequest, TResponse>(
+            this ISetup<T, AsyncDuplexStreamingCall<TRequest, TResponse>> setup,
+            IEnumerable<TResponse> responses)
+            where T : class
+            => setup.Returns(() => responses);
+
+        public static IReturnsResult<T> Returns<T, TRequest, TResponse>(
+            this ISetup<T, AsyncDuplexStreamingCall<TRequest, TResponse>> setup,
+            Func<IEnumerable<TResponse>> responsesFunc)
             where T : class
         {
             var mockResponseStream = new Mock<IAsyncStreamReader<TResponse>>();
             var mockRequestStream = new Mock<IClientStreamWriter<TRequest>>();
 
-            for (var i = 0; i < responses.Length; i++)
+            var responses = responsesFunc();
+
+            var sequentialCurrent = mockResponseStream.SetupSequence(s => s.Current);
+            var sequentialMoveNext = mockResponseStream.SetupSequence(s => s.MoveNext(It.IsAny<CancellationToken>()));
+
+            foreach (var response in responses.ToArray())
             {
-                mockResponseStream.SetupSequence(s => s.Current).Returns(responses[i]);
-                mockResponseStream
-                    .SetupSequence(s => s.MoveNext(It.IsAny<CancellationToken>()))
-                    .Returns(Task.FromResult(i < responses.Length - 1));
+                sequentialCurrent.Returns(response);
+                sequentialMoveNext.Returns(Task.FromResult(true));
             }
 
-            if (responses.Length == 0)
-            {
-                mockResponseStream
-                    .SetupSequence(s => s.MoveNext(It.IsAny<CancellationToken>()))
-                    .Returns(Task.FromResult(false));
-            }
+            sequentialMoveNext.Returns(Task.FromResult(false));
 
             var fakeCall = TestCalls.AsyncDuplexStreamingCall(
                 mockRequestStream.Object,
@@ -116,7 +126,7 @@ namespace Grpc.Net.Testing.Moq
                 () => new Metadata(),
                 () => { });
 
-            return mock.Setup(expression).Returns(fakeCall);
+            return setup.Returns(fakeCall);
         }
     }
 }
