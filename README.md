@@ -9,6 +9,12 @@ Based on libraries:
 * [Grpc.Core.Testing](https://www.nuget.org/packages/Grpc.Core.Testing)
 * [Moq](https://www.nuget.org/packages/Moq)
 
+## Install
+
+### Nuget:
+
+`Install-Package Net.Testing.Moq.Grpc`
+
 ## Using example
 
 ### Simple sync calling:
