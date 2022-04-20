@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
         <Title>Net.Testing.Moq.Grpc</Title>
         <PackageTags>gRPC Moq</PackageTags>
         <Description>Library to mocking gRPC client. Instead of Grpc.Core.Testing using extensions for Moq</Description>
@@ -9,12 +8,13 @@
         <RepositoryUrl>https://github.com/maximiliysiss/grpc.net.testing.moq</RepositoryUrl>
         <PackageId>Net.Testing.Moq.Grpc</PackageId>
         <Authors>maximiliysiss</Authors>
-        <Version>1.1.0</Version>
+        <Version>1.1.1</Version>
+        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Grpc.Core.Testing" Version="2.41.1" />
-      <PackageReference Include="Moq" Version="4.16.1" />
+      <PackageReference Include="Grpc.Core.Testing" Version="2.45.0" />
+      <PackageReference Include="Moq" Version="4.17.2" />
     </ItemGroup>
 
 </Project>
