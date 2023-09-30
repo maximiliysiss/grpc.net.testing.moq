@@ -8,13 +8,16 @@
         <RepositoryUrl>https://github.com/maximiliysiss/grpc.net.testing.moq</RepositoryUrl>
         <PackageId>Net.Testing.Moq.Grpc</PackageId>
         <Authors>maximiliysiss</Authors>
-        <Version>1.1.1</Version>
+        <Version>1.2.0</Version>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Grpc.Core.Testing" Version="2.45.0" />
-      <PackageReference Include="Moq" Version="4.17.2" />
+        <PackageReference Include="Moq" />
+        <PackageReference Include="Grpc" />
     </ItemGroup>
 
 </Project>

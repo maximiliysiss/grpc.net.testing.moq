@@ -11,5 +11,9 @@ service TestService {
   rpc SimpleClientServerStream(stream TestRequest) returns(stream TestResponse);
 }
 
-message TestRequest{}
-message TestResponse{}
+message TestRequest {
+  int32 val = 1;
+}
+message TestResponse {
+  int32 val = 1;
+}
