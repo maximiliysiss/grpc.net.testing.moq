@@ -36,9 +36,9 @@ public static class AsyncDuplexStreamingCallMockExtensions
         public IReturnsResult<TMock> Returns(Func<IEnumerable<TRequest>, IEnumerable<TResponse>> func) => _setup.Returns(
             (Metadata? _, DateTime? _, CancellationToken _) =>
             {
-                var requestStream = new WhenClientStreamWriter<TRequest>();
+                var requestStream = new WhenStreamWriter<TRequest>();
                 var handler = () => func(requestStream.ReadAll());
-                var responseStream = new WhenAsyncStreamReader<TResponse>(handler);
+                var responseStream = new WhenStreamReader<TResponse>(handler);
 
                 var fakeCall = new AsyncDuplexStreamingCall<TRequest, TResponse>(
                     requestStream,

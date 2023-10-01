@@ -6,13 +6,13 @@ using Grpc.Core;
 
 namespace Grpc.Net.Testing.Moq.Shared;
 
-public sealed class WhenAsyncStreamReader<TResponse> : IAsyncStreamReader<TResponse>
+public sealed class WhenStreamReader<TResponse> : IAsyncStreamReader<TResponse>
 {
     private readonly Func<IEnumerable<TResponse>> _source;
 
     private IEnumerator<TResponse>? _enumerator;
 
-    public WhenAsyncStreamReader(Func<IEnumerable<TResponse>> source) => _source = source;
+    public WhenStreamReader(Func<IEnumerable<TResponse>> source) => _source = source;
 
     public Task<bool> MoveNext(CancellationToken cancellationToken)
     {

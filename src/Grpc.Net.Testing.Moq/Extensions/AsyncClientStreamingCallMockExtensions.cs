@@ -36,12 +36,12 @@ public static class AsyncClientStreamingCallMockExtensions
         public IReturnsResult<TMock> Returns(Func<IEnumerable<TRequest>, TResponse> func) => _setup.Returns(
             (Metadata? _, DateTime? _, CancellationToken ct) =>
             {
-                var mockRequestStream = new WhenClientStreamWriter<TRequest>();
-                var stream = mockRequestStream.ReadAll();
+                var requestStream = new WhenStreamWriter<TRequest>();
+                var stream = requestStream.ReadAll();
                 var responseTask = Task.Run(() => func(stream), ct);
 
                 var fakeCall = new AsyncClientStreamingCall<TRequest, TResponse>(
-                    mockRequestStream,
+                    requestStream,
                     responseTask,
                     Task.FromResult(new Metadata()),
                     () => Status.DefaultSuccess,

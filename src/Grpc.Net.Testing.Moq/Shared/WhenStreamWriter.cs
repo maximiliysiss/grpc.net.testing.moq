@@ -5,7 +5,7 @@ using Grpc.Core;
 
 namespace Grpc.Net.Testing.Moq.Shared;
 
-public sealed class WhenClientStreamWriter<TRequest> : IClientStreamWriter<TRequest>
+public sealed class WhenStreamWriter<TRequest> : IClientStreamWriter<TRequest>
 {
     private volatile bool _isCompleted;
     private readonly ConcurrentQueue<TRequest> _messages = new();
