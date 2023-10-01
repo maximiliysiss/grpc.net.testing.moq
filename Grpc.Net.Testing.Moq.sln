@@ -7,10 +7,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2417799A-BA2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C6004532-87C1-4AF0-A67D-A1AC17780A48}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "env", "env", "{7E21EE01-9EB7-46A9-92E6-EE565A6D6DEA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{7E21EE01-9EB7-46A9-92E6-EE565A6D6DEA}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		README.md = README.md
+		Directory.Packages.props = Directory.Packages.props
+		Directory.Build.props = Directory.Build.props
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grpc.Net.Testing.Moq", "src\Grpc.Net.Testing.Moq\Grpc.Net.Testing.Moq.csproj", "{798D6E59-B4AC-422E-9D70-8FD59278A176}"
