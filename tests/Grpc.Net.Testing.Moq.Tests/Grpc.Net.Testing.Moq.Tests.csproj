@@ -27,4 +27,8 @@
         <ProjectReference Include="..\..\src\Grpc.Net.Testing.Moq\Grpc.Net.Testing.Moq.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageVersion Update="System.Linq.Async" Version="6.0.1" />
+    </ItemGroup>
+
 </Project>

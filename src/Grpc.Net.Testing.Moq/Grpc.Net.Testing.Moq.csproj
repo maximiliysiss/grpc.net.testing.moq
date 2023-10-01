@@ -1,23 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <Title>Net.Testing.Moq.Grpc</Title>
-        <PackageTags>gRPC Moq</PackageTags>
-        <Description>Library to mocking gRPC client. Instead of Grpc.Core.Testing using extensions for Moq</Description>
-        <PackageProjectUrl>https://github.com/maximiliysiss/grpc.net.testing.moq</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/maximiliysiss/grpc.net.testing.moq</RepositoryUrl>
-        <PackageId>Net.Testing.Moq.Grpc</PackageId>
-        <Authors>maximiliysiss</Authors>
-        <Version>1.2.0</Version>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Title>Net.Testing.Moq.Grpc</Title>
+    <PackageTags>gRPC Moq</PackageTags>
+    <Description>Library to mocking gRPC client. Instead of Grpc.Core.Testing using extensions for Moq</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/maximiliysiss/grpc.net.testing.moq</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/maximiliysiss/grpc.net.testing.moq</RepositoryUrl>
+    <PackageId>Net.Testing.Moq.Grpc</PackageId>
+    <Authors>maximiliysiss</Authors>
+    <Version>1.2.0</Version>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Moq" />
-        <PackageReference Include="Grpc" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Moq"/>
+    <PackageReference Include="Grpc"/>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
 </Project>
