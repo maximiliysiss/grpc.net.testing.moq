@@ -1,50 +1,82 @@
-name: .NET
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 
+name: publish
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    workflow_dispatch: # Allow running the workflow manually from the GitHub UI
+    push:
+        branches:
+            - 'master'       # Run the workflow when pushing to the main branch
+    pull_request:
+        branches:
+            - '*'          # Run the workflow for all pull requests
+    release:
+        types:
+            - published    # Run the workflow when a new GitHub release is published
+
+env:
+    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+    DOTNET_NOLOGO: true
+    NuGetDirectory: ${{ github.workspace}}/nuget
+
+defaults:
+    run:
+        shell: pwsh
 
 jobs:
-  build:
+    create_nuget:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0 # Get all history to allow automatic versioning using MinVer
 
-    runs-on: ubuntu-latest
+            # Install the .NET SDK indicated in the global.json file
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v3
 
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
-    - name: Restore dependencies
-      run: dotnet restore src/Grpc.Net.Testing.Moq/
-    - name: Build
-      run: dotnet build --no-restore src/Grpc.Net.Testing.Moq/
+            # Create the NuGet package in the folder from the environment variable NuGetDirectory
+            - run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }}
 
-  test:
+            # Publish the NuGet package as an artifact, so they can be used in the following jobs
+            - uses: actions/upload-artifact@v3
+              with:
+                  name: nuget
+                  if-no-files-found: error
+                  retention-days: 7
+                  path: ${{ env.NuGetDirectory }}/*.nupkg
 
-    runs-on: ubuntu-latest
-    needs: build
+    run_test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v3
+            - name: Run tests
+              run: dotnet test --configuration Release
 
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
-    - name: Test
-      run: dotnet test --no-build --verbosity normal src/Grpc.Net.Testing.Moq/
+    deploy:
+        # Publish only when creating a GitHub Release
+        # https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository
+        # You can update this logic if you want to manage releases differently
+        if: github.event_name == 'release'
+        runs-on: ubuntu-latest
+        needs: [ create_nuget, run_test ]
+        steps:
+            # Download the NuGet package created in the previous job
+            - uses: actions/download-artifact@v3
+              with:
+                  name: nuget
+                  path: ${{ env.NuGetDirectory }}
 
-  nuget:
-    runs-on: ubuntu-latest
-    needs: test
+            # Install the .NET SDK indicated in the global.json file
+            - name: Setup .NET Core
+              uses: actions/setup-dotnet@v3
 
-    steps:
-    - uses: actions/checkout@v4
-    - name: Nuget Publish
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: src/Grpc.Net.Testing.Moq/Grpc.Net.Testing.Moq.csproj
-        PACKAGE_NAME: Net.Testing.Moq.Grpc
-        NUGET_KEY: ${{secrets.NUGET_API}}
+            # Publish all NuGet packages to NuGet.org
+            # Use --skip-duplicate to prevent errors if a package with the same version already exists.
+            # If you retry a failed workflow, already published packages will be skipped without error.
+            - name: Publish NuGet package
+              run: |
+                  foreach($file in (Get-ChildItem "${{ env.NuGetDirectory }}" -Recurse -Include *.nupkg)) {
+                      dotnet nuget push $file --api-key "${{ secrets.NUGET_API }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+                  }
