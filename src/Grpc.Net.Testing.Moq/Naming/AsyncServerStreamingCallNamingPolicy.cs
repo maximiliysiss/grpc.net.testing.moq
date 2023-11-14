@@ -14,6 +14,9 @@ public static class AsyncServerStreamingCallNamingPolicy
         where T : class
         => Returns(setup, () => response);
 
+    /// <summary>
+    /// Can use only like `AsyncServerStreamingCallNamingPolicy.Returns`
+    /// </summary>
     public static IReturnsResult<T> Returns<T, TResponse>(
         this ISetup<T, AsyncServerStreamingCall<TResponse>> setup,
         Func<IEnumerable<TResponse>> func)

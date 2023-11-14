@@ -13,6 +13,9 @@ public static class AsyncUnaryCallNamingPolicy
         where T : class
         => Returns(setup, () => response);
 
+    /// <summary>
+    /// Use only like `AsyncUnaryCallNamingPolicy.Returns`
+    /// </summary>
     public static IReturnsResult<T> Returns<T, TResponse>(
         this ISetup<T, AsyncUnaryCall<TResponse>> setup,
         Func<TResponse> func)

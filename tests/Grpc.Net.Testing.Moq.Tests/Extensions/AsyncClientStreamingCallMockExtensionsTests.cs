@@ -8,7 +8,7 @@ using Grpc.Net.Testing.Moq.Tests.Proto;
 using Moq;
 using Xunit;
 
-namespace Grpc.Net.Testing.Moq.Tests;
+namespace Grpc.Net.Testing.Moq.Tests.Extensions;
 
 public class AsyncClientStreamingCallMockExtensionsTests
 {

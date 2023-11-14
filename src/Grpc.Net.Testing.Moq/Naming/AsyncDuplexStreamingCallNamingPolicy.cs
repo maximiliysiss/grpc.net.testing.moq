@@ -14,6 +14,9 @@ public static class AsyncDuplexStreamingCallNamingPolicy
         where T : class
         => Returns(setup, () => response);
 
+    /// <summary>
+    /// Use only like `AsyncDuplexStreamingCallNamingPolicy.Returns`
+    /// </summary>
     public static IReturnsResult<T> Returns<T, TRequest, TResponse>(
         this ISetup<T, AsyncDuplexStreamingCall<TRequest, TResponse>> setup,
         Func<IEnumerable<TResponse>> func)

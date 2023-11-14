@@ -1,33 +1,15 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using FluentAssertions;
+using Grpc.Net.Testing.Moq.Naming;
 using Grpc.Net.Testing.Moq.Tests.Proto;
-using Xunit;
 using Moq;
-using Grpc.Net.Testing.Moq.Extensions;
+using Xunit;
 
-namespace Grpc.Net.Testing.Moq.Tests;
+namespace Grpc.Net.Testing.Moq.Tests.Naming;
 
-public class AsyncUnaryCallMockExtensionsTests
+public class AsyncUnaryCallNamingPolicyTests
 {
-    [Theory, AutoData]
-    public void Simple_ShouldReturnResponse(TestResponse expectedResponse)
-    {
-        // Arrange
-        var grpcMock = new Mock<TestService.TestServiceClient>();
-        grpcMock
-            .Setup(c => c.Simple(It.IsAny<TestRequest>(), null, null, default))
-            .Returns(expectedResponse);
-
-        var client = grpcMock.Object;
-
-        // Act
-        var response = client.Simple(new TestRequest());
-
-        // Assert
-        response.Should().BeEquivalentTo(expectedResponse);
-    }
-
     [Theory, AutoData]
     public async Task SimpleAsync_ShouldReturnResponse(TestResponse expectedResponse)
     {
@@ -35,7 +17,7 @@ public class AsyncUnaryCallMockExtensionsTests
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
             .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
-            .ReturnsAsync(expectedResponse);
+            .Returns(expectedResponse);
 
         var client = grpcMock.Object;
 
@@ -51,9 +33,9 @@ public class AsyncUnaryCallMockExtensionsTests
     {
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
-        grpcMock
-            .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
-            .ReturnsAsync(() => expectedResponse);
+        AsyncUnaryCallNamingPolicy.Returns(
+            grpcMock.Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default)),
+            () => expectedResponse);
 
         var client = grpcMock.Object;
 
@@ -71,7 +53,7 @@ public class AsyncUnaryCallMockExtensionsTests
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
             .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
-            .ReturnsAsync<TestService.TestServiceClient, TestRequest, TestResponse>(c => new TestResponse { Val = c.Val });
+            .Returns<TestService.TestServiceClient, TestRequest, TestResponse>(c => new TestResponse { Val = c.Val });
 
         var client = grpcMock.Object;
 

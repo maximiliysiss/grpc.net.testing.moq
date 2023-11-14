@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using FluentAssertions;
 using Grpc.Core;
-using Grpc.Net.Testing.Moq.Extensions;
+using Grpc.Net.Testing.Moq.Naming;
 using Grpc.Net.Testing.Moq.Tests.Proto;
 using Moq;
 using Xunit;
 
-namespace Grpc.Net.Testing.Moq.Tests;
+namespace Grpc.Net.Testing.Moq.Tests.Naming;
 
-public class AsyncServerStreamingCallMockExtensionsTests
+public class AsyncServerStreamingCallNamingPolicyTests
 {
     [Theory, AutoData]
     public async Task SimpleServer_ShouldReturnResponse(TestResponse[] expectedResponses)
@@ -20,7 +20,7 @@ public class AsyncServerStreamingCallMockExtensionsTests
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
             .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-            .ReturnsAsync(expectedResponses);
+            .Returns(expectedResponses);
 
         var client = grpcMock.Object;
 
@@ -37,9 +37,9 @@ public class AsyncServerStreamingCallMockExtensionsTests
     {
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
-        grpcMock
-            .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-            .ReturnsAsync(() => expectedResponses);
+        AsyncServerStreamingCallNamingPolicy.Returns(
+            grpcMock.Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default)),
+            () => expectedResponses);
 
         var client = grpcMock.Object;
 
@@ -58,7 +58,7 @@ public class AsyncServerStreamingCallMockExtensionsTests
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
             .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-            .ReturnsAsync<TestService.TestServiceClient, TestRequest, TestResponse>(Map);
+            .Returns<TestService.TestServiceClient, TestRequest, TestResponse>(Map);
 
         var client = grpcMock.Object;
 

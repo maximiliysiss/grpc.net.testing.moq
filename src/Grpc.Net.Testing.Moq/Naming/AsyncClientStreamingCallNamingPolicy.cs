@@ -14,6 +14,9 @@ public static class AsyncClientStreamingCallNamingPolicy
         where T : class
         => Returns(setup, () => response);
 
+    /// <summary>
+    /// Use only like `AsyncClientStreamingCallNamingPolicy.Returns`
+    /// </summary>
     public static IReturnsResult<T> Returns<T, TRequest, TResponse>(
         this ISetup<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
         Func<TResponse> func)

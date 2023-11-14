@@ -16,24 +16,27 @@ Based on libraries:
 
 ## Using example
 
+> There is naming policy aka `.Setup(...).Returns(...)`, but it cannot use with Delegates (only for values computed
+> outside)
+
 ### Simple sync calling:
 
 #### 1. Call with exists response
+
 ```c#
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 
 // Setup and set return
 grpcMock
-    .When(c => c.Simple(It.IsAny<TestRequest>(), null, null, default))
-    .Returns(new TestResponse());
+    .Setup(c => c.Simple(It.IsAny<TestRequest>(), null, null, default))
+    .ReturnsAsync(new TestResponse());
 
 var client = grpcMock.Object;
 
 // Call
 var response = client.Simple(new TestRequest());
 ```
-
 
 ### Simple async calling:
 
@@ -46,8 +49,8 @@ var testResponse = new TestResponse();
 
 // Setup and set return
 grpcMock
-    .When(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
-    .Returns(testResponse);
+    .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+    .ReturnsAsync(testResponse);
 
 var client = grpcMock.Object;
 
@@ -56,14 +59,15 @@ var response = await client.SimpleAsync(new TestRequest());
 ```
 
 #### 2. Call with response creating on call
+
 ```c#
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 
 // Setup and set return by lambda
 grpcMock
-    .When(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
-    .Returns(() => new TestResponse());
+    .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+    .ReturnsAsync(() => new TestResponse());
 
 var client = grpcMock.Object;
 
@@ -72,14 +76,15 @@ var response = client.SimpleAsync(new TestRequest());
 ```
 
 #### 3. Call with response creating on call and based on request
+
 ```c#
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 
 // Setup and set return by lambda with request param
 grpcMock
-    .When(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
-    .Returns<TestRequest>(r => new TestResponse{ Val = r.Val });
+    .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+    .ReturnsAsync<TestService.TestServiceClient, TestRequest, TestResponse>(r => new TestResponse{ Val = r.Val });
 
 var client = grpcMock.Object;
 
@@ -98,8 +103,8 @@ var testResponse = new TestResponse();
 
 // Setup and set response
 grpcMock
-    .When(c => c.SimpleClientStream(null, null, default))
-    .Returns(testResponse);
+    .Setup(c => c.SimpleClientStream(null, null, default))
+    .ReturnsAsync(testResponse);
 
 var client = grpcMock.Object;
 
@@ -118,8 +123,8 @@ var testResponse = new TestResponse();
 
 // Setup and set response by lambda
 grpcMock
-    .When(c => c.SimpleClientStream(null, null, default))
-    .Returns(() => testResponse);
+    .Setup(c => c.SimpleClientStream(null, null, default))
+    .ReturnsAsync(() => testResponse);
 
 var client = grpcMock.Object;
 
@@ -137,8 +142,8 @@ var grpcMock = new Mock<TestService.TestServiceClient>();
 
 // Setup and set response by lambda and requests like param
 grpcMock
-    .When(c => c.SimpleClientStream(null, null, default))
-    .Returns(rs => new TestResponse{ Val = rs.Sum(r => r.Val) });
+    .Setup(c => c.SimpleClientStream(null, null, default))
+    .ReturnsAsync(rs => new TestResponse{ Val = rs.Sum(r => r.Val) });
 
 var client = grpcMock.Object;
 
@@ -159,8 +164,8 @@ var testResponse = new[]{ new TestResponse() };
 
 // Setup and set responses like argument (params TResponse[] responses)
 grpcMock
-    .When(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-    .Returns(testResponse);
+    .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+    .ReturnsAsync(testResponse);
 
 var client = grpcMock.Object;
 
@@ -178,8 +183,8 @@ var testResponse = new[]{ new TestResponse() };
 
 // Setup and set responses by lambda (factory)
 grpcMock
-    .When(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-    .Returns(() => testResponse);
+    .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+    .ReturnsAsync(() => testResponse);
 
 var client = grpcMock.Object;
 
@@ -196,8 +201,8 @@ var grpcMock = new Mock<TestService.TestServiceClient>();
 
 // Setup and set responses by lambda and request like argument
 grpcMock
-    .When(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-    .Returns<TestRequest>(r => new[]{ new TestResponse{ Val = r.Val } });
+    .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+    .ReturnsAsync<TestService.TestServiceClient, TestRequest, TestResponse>(r => new[]{ new TestResponse{ Val = r.Val } });
 
 var client = grpcMock.Object;
 
@@ -217,8 +222,8 @@ var testResponse = new[]{ new TestResponse() };
 
 // Setup and set responses like argument (params TResponse[] responses)
 grpcMock
-    .When(c => c.SimpleClientServerStream(null, null, default))
-    .Returns(testResponse);
+    .Setup(c => c.SimpleClientServerStream(null, null, default))
+    .ReturnsAsync(testResponse);
 
 var client = grpcMock.Object;
 
@@ -237,8 +242,8 @@ var testResponse = new[]{ new TestResponse() };
 
 // Setup and set responses by lambda
 grpcMock
-    .When(c => c.SimpleClientServerStream(null, null, default))
-    .Returns(() => testResponse);
+    .Setup(c => c.SimpleClientServerStream(null, null, default))
+    .ReturnsAsync(() => testResponse);
 
 var client = grpcMock.Object;
 
@@ -257,8 +262,8 @@ var testResponse = new[]{ new TestResponse() };
 
 // Setup and set responses by lambda and requests like args
 grpcMock
-    .When(c => c.SimpleClientServerStream(null, null, default))
-    .Returns(rs => rs.Select(r => new TestResponse{ Val = r.Val }));
+    .Setup(c => c.SimpleClientServerStream(null, null, default))
+    .ReturnsAsync(rs => rs.Select(r => new TestResponse{ Val = r.Val }));
 
 var client = grpcMock.Object;
 
