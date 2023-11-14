@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using FluentAssertions;
@@ -18,8 +19,8 @@ public class AsyncServerStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-            .Returns(expectedResponses);
+            .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+            .ReturnsAsync(expectedResponses);
 
         var client = grpcMock.Object;
 
@@ -37,8 +38,8 @@ public class AsyncServerStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-            .Returns(() => expectedResponses);
+            .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+            .ReturnsAsync(() => expectedResponses);
 
         var client = grpcMock.Object;
 
@@ -56,8 +57,8 @@ public class AsyncServerStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-            .Returns<TestRequest>(r => Enumerable.Repeat(new TestResponse { Val = r.Val }, 2));
+            .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+            .ReturnsAsync<TestService.TestServiceClient, TestRequest, TestResponse>(Map);
 
         var client = grpcMock.Object;
 
@@ -67,5 +68,7 @@ public class AsyncServerStreamingCallMockExtensionsTests
 
         // Assert
         messages.Should().AllSatisfy(response => response.Val.Should().Be(request.Val));
+
+        IEnumerable<TestResponse> Map(TestRequest r) => Enumerable.Repeat(new TestResponse { Val = r.Val }, 2);
     }
 }

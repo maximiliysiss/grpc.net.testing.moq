@@ -17,12 +17,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Moq"/>
-    <PackageReference Include="Grpc"/>
+    <PackageReference Include="Moq" />
+    <PackageReference Include="Grpc" />
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

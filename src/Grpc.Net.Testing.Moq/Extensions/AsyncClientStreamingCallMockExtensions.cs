@@ -1,39 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
-using Grpc.Net.Testing.Moq.Calls;
 using Grpc.Net.Testing.Moq.Shared;
-using Moq;
 using Moq.Language.Flow;
 
 namespace Grpc.Net.Testing.Moq.Extensions;
 
 public static class AsyncClientStreamingCallMockExtensions
 {
-    public static IWhenClientStreamCall<TMock, TRequest, TResponse> When<TMock, TRequest, TResponse>(
-        this Mock<TMock> mock,
-        Expression<Func<TMock, AsyncClientStreamingCall<TRequest, TResponse>>> expression)
-        where TMock : class
-    {
-        var setup = mock.Setup(expression);
-        return new WhenClientStreamCall<TMock, TRequest, TResponse>(setup);
-    }
+    public static IReturnsResult<T> ReturnsAsync<T, TRequest, TResponse>(
+        this ISetup<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
+        TResponse response)
+        where T : class
+        => ReturnsAsync(setup, () => response);
 
-    private sealed class WhenClientStreamCall<TMock, TRequest, TResponse> : IWhenClientStreamCall<TMock, TRequest, TResponse>
-        where TMock : class
-    {
-        private readonly ISetup<TMock, AsyncClientStreamingCall<TRequest, TResponse>> _setup;
+    public static IReturnsResult<T> ReturnsAsync<T, TRequest, TResponse>(
+        this ISetup<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
+        Func<TResponse> func)
+        where T : class
+        => ReturnsAsync(setup, _ => func());
 
-        public WhenClientStreamCall(ISetup<TMock, AsyncClientStreamingCall<TRequest, TResponse>> setup) => _setup = setup;
-
-        public IReturnsResult<TMock> Returns(TResponse response) => Returns(() => response);
-
-        public IReturnsResult<TMock> Returns(Func<TResponse> func) => Returns(_ => func());
-
-        public IReturnsResult<TMock> Returns(Func<IEnumerable<TRequest>, TResponse> func) => _setup.Returns(
+    public static IReturnsResult<T> ReturnsAsync<T, TRequest, TResponse>(
+        this ISetup<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
+        Func<IEnumerable<TRequest>, TResponse> func)
+        where T : class
+        => setup.Returns(
             (Metadata? _, DateTime? _, CancellationToken ct) =>
             {
                 var requestStream = new WhenStreamWriter<TRequest>();
@@ -50,5 +43,4 @@ public static class AsyncClientStreamingCallMockExtensions
 
                 return fakeCall;
             });
-    }
 }

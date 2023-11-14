@@ -19,8 +19,8 @@ public class AsyncDuplexStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleClientServerStream(null, null, default))
-            .Returns(expectedResponses);
+            .Setup(c => c.SimpleClientServerStream(null, null, default))
+            .ReturnsAsync(expectedResponses);
 
         var client = grpcMock.Object;
 
@@ -38,8 +38,8 @@ public class AsyncDuplexStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleClientServerStream(null, null, default))
-            .Returns(expectedResponses);
+            .Setup(c => c.SimpleClientServerStream(null, null, default))
+            .ReturnsAsync(expectedResponses);
 
         var client = grpcMock.Object;
 
@@ -59,8 +59,8 @@ public class AsyncDuplexStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleClientServerStream(null, null, default))
-            .Returns(() => expectedResponses);
+            .Setup(c => c.SimpleClientServerStream(null, null, default))
+            .ReturnsAsync(() => expectedResponses);
 
         var client = grpcMock.Object;
 
@@ -78,8 +78,8 @@ public class AsyncDuplexStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleClientServerStream(null, null, default))
-            .Returns(() => expectedResponses);
+            .Setup(c => c.SimpleClientServerStream(null, null, default))
+            .ReturnsAsync(() => expectedResponses);
 
         var client = grpcMock.Object;
 
@@ -99,8 +99,8 @@ public class AsyncDuplexStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleClientServerStream(null, null, default))
-            .Returns(rs => rs.Select(r => new TestResponse { Val = r.Val }));
+            .Setup(c => c.SimpleClientServerStream(null, null, default))
+            .ReturnsAsync(rs => rs.Select(r => new TestResponse { Val = r.Val }));
 
         var client = grpcMock.Object;
 
@@ -126,8 +126,8 @@ public class AsyncDuplexStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleClientServerStream(null, null, default))
-            .Returns(rs => rs.Select(r => new TestResponse { Val = r.Val }));
+            .Setup(c => c.SimpleClientServerStream(null, null, default))
+            .ReturnsAsync(rs => rs.Select(r => new TestResponse { Val = r.Val }));
 
         var client = grpcMock.Object;
 
@@ -155,8 +155,8 @@ public class AsyncDuplexStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleClientServerStream(null, null, default))
-            .Returns(rs => new[] { new TestResponse { Val = rs.Sum(r => r.Val) } });
+            .Setup(c => c.SimpleClientServerStream(null, null, default))
+            .ReturnsAsync(rs => new[] { new TestResponse { Val = rs.Sum(r => r.Val) } });
 
         var client = grpcMock.Object;
 

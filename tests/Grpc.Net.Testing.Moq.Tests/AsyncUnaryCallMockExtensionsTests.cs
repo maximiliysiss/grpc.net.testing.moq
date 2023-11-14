@@ -2,8 +2,8 @@
 using AutoFixture.Xunit2;
 using FluentAssertions;
 using Grpc.Net.Testing.Moq.Tests.Proto;
-using Moq;
 using Xunit;
+using Moq;
 using Grpc.Net.Testing.Moq.Extensions;
 
 namespace Grpc.Net.Testing.Moq.Tests;
@@ -16,7 +16,7 @@ public class AsyncUnaryCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.Simple(It.IsAny<TestRequest>(), null, null, default))
+            .Setup(c => c.Simple(It.IsAny<TestRequest>(), null, null, default))
             .Returns(expectedResponse);
 
         var client = grpcMock.Object;
@@ -34,8 +34,8 @@ public class AsyncUnaryCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
-            .Returns(expectedResponse);
+            .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+            .ReturnsAsync(expectedResponse);
 
         var client = grpcMock.Object;
 
@@ -52,8 +52,8 @@ public class AsyncUnaryCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
-            .Returns(() => expectedResponse);
+            .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+            .ReturnsAsync(() => expectedResponse);
 
         var client = grpcMock.Object;
 
@@ -70,8 +70,8 @@ public class AsyncUnaryCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
-            .Returns<TestRequest>(c => new TestResponse { Val = c.Val });
+            .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+            .ReturnsAsync<TestService.TestServiceClient, TestRequest, TestResponse>(c => new TestResponse { Val = c.Val });
 
         var client = grpcMock.Object;
 
