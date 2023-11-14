@@ -1,16 +1,17 @@
-﻿using System.Linq;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using FluentAssertions;
 using Grpc.Core;
-using Grpc.Net.Testing.Moq.Extensions;
+using Grpc.Net.Testing.Moq.Naming;
 using Grpc.Net.Testing.Moq.Tests.Proto;
 using Moq;
 using Xunit;
 
-namespace Grpc.Net.Testing.Moq.Tests;
+namespace Grpc.Net.Testing.Moq.Tests.Naming;
 
-public class AsyncServerStreamingCallMockExtensionsTests
+public class AsyncServerStreamingCallNamingPolicyTests
 {
     [Theory, AutoData]
     public async Task SimpleServer_ShouldReturnResponse(TestResponse[] expectedResponses)
@@ -18,7 +19,7 @@ public class AsyncServerStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+            .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
             .Returns(expectedResponses);
 
         var client = grpcMock.Object;
@@ -36,9 +37,9 @@ public class AsyncServerStreamingCallMockExtensionsTests
     {
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
-        grpcMock
-            .When(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-            .Returns(() => expectedResponses);
+        AsyncServerStreamingCallNamingPolicy.Returns(
+            grpcMock.Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default)),
+            () => expectedResponses);
 
         var client = grpcMock.Object;
 
@@ -56,8 +57,8 @@ public class AsyncServerStreamingCallMockExtensionsTests
         // Arrange
         var grpcMock = new Mock<TestService.TestServiceClient>();
         grpcMock
-            .When(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
-            .Returns<TestRequest>(r => Enumerable.Repeat(new TestResponse { Val = r.Val }, 2));
+            .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+            .Returns<TestService.TestServiceClient, TestRequest, TestResponse>(Map);
 
         var client = grpcMock.Object;
 
@@ -67,5 +68,7 @@ public class AsyncServerStreamingCallMockExtensionsTests
 
         // Assert
         messages.Should().AllSatisfy(response => response.Val.Should().Be(request.Val));
+
+        IEnumerable<TestResponse> Map(TestRequest r) => Enumerable.Repeat(new TestResponse { Val = r.Val }, 2);
     }
 }
