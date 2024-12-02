@@ -25,6 +25,9 @@ public class AsyncClientStreamingCallMockExtensionsTests
 
         // Act
         var call = client.SimpleClientStream();
+
+        await call.RequestStream.CompleteAsync();
+
         var message = await call;
 
         // Assert
@@ -46,6 +49,7 @@ public class AsyncClientStreamingCallMockExtensionsTests
         var call = client.SimpleClientStream();
 
         await call.RequestStream.WriteAllAsync(requests, complete: true);
+
         var message = await call;
 
         // Assert
@@ -65,6 +69,9 @@ public class AsyncClientStreamingCallMockExtensionsTests
 
         // Act
         var call = client.SimpleClientStream();
+
+        await call.RequestStream.CompleteAsync();
+
         var message = await call;
 
         // Assert
@@ -86,6 +93,7 @@ public class AsyncClientStreamingCallMockExtensionsTests
         var call = client.SimpleClientStream();
 
         await call.RequestStream.WriteAllAsync(requests, complete: true);
+
         var message = await call;
 
         // Assert
@@ -107,6 +115,7 @@ public class AsyncClientStreamingCallMockExtensionsTests
         var call = client.SimpleClientStream();
 
         await call.RequestStream.WriteAllAsync(requests, complete: true);
+
         var message = await call;
 
         // Assert
@@ -130,6 +139,7 @@ public class AsyncClientStreamingCallMockExtensionsTests
         var call = client.SimpleClientStream();
 
         var requestTask = call.RequestStream.WriteAllAsync(requests, complete: true);
+
         var message = await call;
 
         await requestTask;

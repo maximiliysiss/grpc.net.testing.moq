@@ -26,9 +26,9 @@ public static class AsyncUnaryCallMockExtensions
         where T : class
         => setup.Returns(
             (TRequest r, Metadata? _, DateTime? _, CancellationToken _) => new AsyncUnaryCall<TResponse>(
-                Task.FromResult(func(r)),
-                Task.FromResult(new Metadata()),
-                () => Status.DefaultSuccess,
-                () => new Metadata(),
-                () => { }));
+                responseAsync: Task.FromResult(func(r)),
+                responseHeadersAsync: Task.FromResult(new Metadata()),
+                getStatusFunc: () => Status.DefaultSuccess,
+                getTrailersFunc: () => [],
+                disposeAction: () => { }));
 }

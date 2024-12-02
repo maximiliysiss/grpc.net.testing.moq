@@ -26,7 +26,12 @@ public class AsyncDuplexStreamingCallMockExtensionsTests
 
         // Act
         var call = client.SimpleClientServerStream();
-        var messages = await call.ResponseStream.ReadAllAsync().ToArrayAsync();
+
+        await call.RequestStream.CompleteAsync();
+
+        var messages = await call.ResponseStream
+            .ReadAllAsync()
+            .ToArrayAsync();
 
         // Assert
         messages.Should().BeEquivalentTo(expectedResponses);
@@ -66,7 +71,12 @@ public class AsyncDuplexStreamingCallMockExtensionsTests
 
         // Act
         var call = client.SimpleClientServerStream();
-        var messages = await call.ResponseStream.ReadAllAsync().ToArrayAsync();
+
+        await call.RequestStream.CompleteAsync();
+
+        var messages = await call.ResponseStream
+            .ReadAllAsync()
+            .ToArrayAsync();
 
         // Assert
         messages.Should().BeEquivalentTo(expectedResponses);

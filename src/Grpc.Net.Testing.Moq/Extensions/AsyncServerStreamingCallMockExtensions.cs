@@ -30,27 +30,22 @@ public static class AsyncServerStreamingCallMockExtensions
         => setup.Returns(
             (TRequest r, Metadata? _, DateTime? _, CancellationToken _) =>
             {
-                var mockResponseStream = new Mock<IAsyncStreamReader<TResponse>>();
-                var responses = func(r);
+                var enumerator = func(r).ToList().GetEnumerator();
 
-                var sequentialCurrent = mockResponseStream.SetupSequence(s => s.Current);
-                var sequentialMoveNext = mockResponseStream.SetupSequence(s => s.MoveNext(It.IsAny<CancellationToken>()));
+                var responseStream = new Mock<IAsyncStreamReader<TResponse>>(MockBehavior.Strict);
 
-                foreach (var response in responses.ToArray())
-                {
-                    sequentialCurrent.Returns(response);
-                    sequentialMoveNext.Returns(Task.FromResult(true));
-                }
+                responseStream
+                    .SetupGet(c => c.Current)
+                    .Returns(() => enumerator.Current);
+                responseStream
+                    .Setup(c => c.MoveNext(It.IsAny<CancellationToken>()))
+                    .Returns(() => Task.FromResult(enumerator.MoveNext()));
 
-                sequentialMoveNext.Returns(Task.FromResult(false));
-
-                var fakeCall = new AsyncServerStreamingCall<TResponse>(
-                    mockResponseStream.Object,
-                    Task.FromResult(new Metadata()),
-                    () => Status.DefaultSuccess,
-                    () => new Metadata(),
-                    () => { });
-
-                return fakeCall;
+                return new AsyncServerStreamingCall<TResponse>(
+                    responseStream: responseStream.Object,
+                    responseHeadersAsync: Task.FromResult(new Metadata()),
+                    getStatusFunc: () => Status.DefaultSuccess,
+                    getTrailersFunc: () => [],
+                    disposeAction: () => { });
             });
 }

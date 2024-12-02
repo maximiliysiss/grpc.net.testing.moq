@@ -27,6 +27,7 @@ public class AsyncClientStreamingCallNamingPolicyTests
         var call = client.SimpleClientStream();
 
         await call.RequestStream.WriteAllAsync(requests, complete: true);
+
         var message = await call;
 
         // Assert
@@ -46,6 +47,9 @@ public class AsyncClientStreamingCallNamingPolicyTests
 
         // Act
         var call = client.SimpleClientStream();
+
+        await call.RequestStream.CompleteAsync();
+
         var message = await call;
 
         // Assert
@@ -67,6 +71,7 @@ public class AsyncClientStreamingCallNamingPolicyTests
         var call = client.SimpleClientStream();
 
         await call.RequestStream.WriteAllAsync(requests, complete: true);
+
         var message = await call;
 
         // Assert

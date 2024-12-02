@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
-using Grpc.Net.Testing.Moq.Shared;
+using Moq;
 using Moq.Language.Flow;
 
 namespace Grpc.Net.Testing.Moq.Extensions;
@@ -29,18 +29,36 @@ public static class AsyncDuplexStreamingCallMockExtensions
         => setup.Returns(
             (Metadata? _, DateTime? _, CancellationToken _) =>
             {
-                var requestStream = new WhenStreamWriter<TRequest>();
-                var handler = () => func(requestStream.ReadAll());
-                var responseStream = new WhenStreamReader<TResponse>(handler);
+                var requests = new List<TRequest>();
+                var responses = new List<TResponse>();
 
-                var fakeCall = new AsyncDuplexStreamingCall<TRequest, TResponse>(
-                    requestStream,
-                    responseStream,
-                    Task.FromResult(new Metadata()),
-                    () => Status.DefaultSuccess,
-                    () => new Metadata(),
-                    () => { });
+                var writer = new Mock<IClientStreamWriter<TRequest>>();
+                var reader = new Mock<IAsyncStreamReader<TResponse>>();
 
-                return fakeCall;
+                writer
+                    .Setup(c => c.WriteAsync(It.IsAny<TRequest>()))
+                    .Callback((TRequest request) => requests.Add(request))
+                    .Returns(Task.CompletedTask);
+                writer
+                    .Setup(c => c.CompleteAsync())
+                    .Callback(() => responses.AddRange(func(requests)))
+                    .Returns(Task.CompletedTask);
+
+                var index = -1;
+
+                reader
+                    .Setup(c => c.MoveNext(It.IsAny<CancellationToken>()))
+                    .Returns(() => Task.FromResult(++index < responses.Count));
+                reader
+                    .SetupGet(c => c.Current)
+                    .Returns(() => responses[index]);
+
+                return new AsyncDuplexStreamingCall<TRequest, TResponse>(
+                    requestStream: writer.Object,
+                    responseStream: reader.Object,
+                    responseHeadersAsync: Task.FromResult(new Metadata()),
+                    getStatusFunc: () => Status.DefaultSuccess,
+                    getTrailersFunc: () => [],
+                    disposeAction: () => { });
             });
 }
