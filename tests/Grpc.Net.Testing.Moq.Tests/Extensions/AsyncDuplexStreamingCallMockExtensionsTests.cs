@@ -38,6 +38,35 @@ public class AsyncDuplexStreamingCallMockExtensionsTests
     }
 
     [Theory, AutoData]
+    public async Task SimpleServer_ShouldReturnResponseAndCallback(TestResponse[] expectedResponses)
+    {
+        // Arrange
+        var flag = false;
+
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .Setup(c => c.SimpleClientServerStream(null, null, default))
+            .Callback(() => flag = true)
+            .ReturnsAsync(expectedResponses);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var call = client.SimpleClientServerStream();
+
+        await call.RequestStream.CompleteAsync();
+
+        var messages = await call.ResponseStream
+            .ReadAllAsync()
+            .ToArrayAsync();
+
+        // Assert
+        messages.Should().BeEquivalentTo(expectedResponses);
+
+        flag.Should().BeTrue();
+    }
+
+    [Theory, AutoData]
     public async Task SimpleServer_ShouldReturnResponse_WithRequest(TestRequest[] requests, TestResponse[] expectedResponses)
     {
         // Arrange

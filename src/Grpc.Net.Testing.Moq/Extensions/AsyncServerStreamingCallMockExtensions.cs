@@ -12,19 +12,19 @@ namespace Grpc.Net.Testing.Moq.Extensions;
 public static class AsyncServerStreamingCallMockExtensions
 {
     public static IReturnsResult<T> ReturnsAsync<T, TResponse>(
-        this ISetup<T, AsyncServerStreamingCall<TResponse>> setup,
+        this IReturnsThrows<T, AsyncServerStreamingCall<TResponse>> setup,
         params TResponse[] response)
         where T : class
         => ReturnsAsync(setup, () => response);
 
     public static IReturnsResult<T> ReturnsAsync<T, TResponse>(
-        this ISetup<T, AsyncServerStreamingCall<TResponse>> setup,
+        this IReturnsThrows<T, AsyncServerStreamingCall<TResponse>> setup,
         Func<IEnumerable<TResponse>> func)
         where T : class
         => ReturnsAsync<T, object, TResponse>(setup, _ => func());
 
     public static IReturnsResult<T> ReturnsAsync<T, TRequest, TResponse>(
-        this ISetup<T, AsyncServerStreamingCall<TResponse>> setup,
+        this IReturnsThrows<T, AsyncServerStreamingCall<TResponse>> setup,
         Func<TRequest, IEnumerable<TResponse>> func)
         where T : class
         => setup.Returns(

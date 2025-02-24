@@ -35,6 +35,33 @@ public class AsyncClientStreamingCallMockExtensionsTests
     }
 
     [Theory, AutoData]
+    public async Task SimpleServer_ShouldReturnResponseAndCallback(TestResponse expectedResponses)
+    {
+        // Arrange
+        var flag = false;
+
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .Setup(c => c.SimpleClientStream(null, null, default))
+            .Callback(() => flag = true)
+            .ReturnsAsync(expectedResponses);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var call = client.SimpleClientStream();
+
+        await call.RequestStream.CompleteAsync();
+
+        var message = await call;
+
+        // Assert
+        message.Should().BeEquivalentTo(expectedResponses);
+
+        flag.Should().BeTrue();
+    }
+
+    [Theory, AutoData]
     public async Task SimpleServer_ShouldReturnResponse_WithRequests(TestRequest[] requests, TestResponse expectedResponses)
     {
         // Arrange

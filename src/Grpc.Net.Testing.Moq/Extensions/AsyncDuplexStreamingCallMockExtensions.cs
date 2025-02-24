@@ -11,19 +11,19 @@ namespace Grpc.Net.Testing.Moq.Extensions;
 public static class AsyncDuplexStreamingCallMockExtensions
 {
     public static IReturnsResult<T> ReturnsAsync<T, TRequest, TResponse>(
-        this ISetup<T, AsyncDuplexStreamingCall<TRequest, TResponse>> setup,
+        this IReturnsThrows<T, AsyncDuplexStreamingCall<TRequest, TResponse>> setup,
         params TResponse[] response)
         where T : class
         => ReturnsAsync(setup, () => response);
 
     public static IReturnsResult<T> ReturnsAsync<T, TRequest, TResponse>(
-        this ISetup<T, AsyncDuplexStreamingCall<TRequest, TResponse>> setup,
+        this IReturnsThrows<T, AsyncDuplexStreamingCall<TRequest, TResponse>> setup,
         Func<IEnumerable<TResponse>> func)
         where T : class
         => ReturnsAsync(setup, _ => func());
 
     public static IReturnsResult<T> ReturnsAsync<T, TRequest, TResponse>(
-        this ISetup<T, AsyncDuplexStreamingCall<TRequest, TResponse>> setup,
+        this IReturnsThrows<T, AsyncDuplexStreamingCall<TRequest, TResponse>> setup,
         Func<IEnumerable<TRequest>, IEnumerable<TResponse>> func)
         where T : class
         => setup.Returns(

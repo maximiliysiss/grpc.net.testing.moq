@@ -9,19 +9,19 @@ namespace Grpc.Net.Testing.Moq.Extensions;
 public static class AsyncUnaryCallMockExtensions
 {
     public static IReturnsResult<T> ReturnsAsync<T, TResponse>(
-        this ISetup<T, AsyncUnaryCall<TResponse>> setup,
+        this IReturnsThrows<T, AsyncUnaryCall<TResponse>> setup,
         TResponse response)
         where T : class
         => ReturnsAsync(setup, () => response);
 
     public static IReturnsResult<T> ReturnsAsync<T, TResponse>(
-        this ISetup<T, AsyncUnaryCall<TResponse>> setup,
+        this IReturnsThrows<T, AsyncUnaryCall<TResponse>> setup,
         Func<TResponse> func)
         where T : class
         => ReturnsAsync<T, object, TResponse>(setup, _ => func());
 
     public static IReturnsResult<T> ReturnsAsync<T, TRequest, TResponse>(
-        this ISetup<T, AsyncUnaryCall<TResponse>> setup,
+        this IReturnsThrows<T, AsyncUnaryCall<TResponse>> setup,
         Func<TRequest, TResponse> func)
         where T : class
         => setup.Returns(

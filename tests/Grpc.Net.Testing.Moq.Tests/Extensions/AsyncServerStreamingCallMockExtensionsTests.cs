@@ -33,6 +33,30 @@ public class AsyncServerStreamingCallMockExtensionsTests
     }
 
     [Theory, AutoData]
+    public async Task SimpleServer_ShouldReturnResponseAndCallback(TestResponse[] expectedResponses)
+    {
+        // Arrange
+        var flag = false;
+
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .Setup(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+            .Callback(() => flag = true)
+            .ReturnsAsync(expectedResponses);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var call = client.SimpleServerStream(new TestRequest());
+        var messages = await call.ResponseStream.ReadAllAsync().ToArrayAsync();
+
+        // Assert
+        messages.Should().BeEquivalentTo(expectedResponses);
+
+        flag.Should().BeTrue();
+    }
+
+    [Theory, AutoData]
     public async Task SimpleServer_ShouldReturnResponse_WhenCalledByLambda(TestResponse[] expectedResponses)
     {
         // Arrange
