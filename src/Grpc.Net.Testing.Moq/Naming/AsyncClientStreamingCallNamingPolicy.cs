@@ -9,7 +9,7 @@ namespace Grpc.Net.Testing.Moq.Naming;
 public static class AsyncClientStreamingCallNamingPolicy
 {
     public static IReturnsResult<T> Returns<T, TRequest, TResponse>(
-        this ISetup<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
+        this IReturnsThrows<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
         TResponse response)
         where T : class
         => Returns(setup, () => response);
@@ -18,13 +18,13 @@ public static class AsyncClientStreamingCallNamingPolicy
     /// Use only like `AsyncClientStreamingCallNamingPolicy.Returns`
     /// </summary>
     public static IReturnsResult<T> Returns<T, TRequest, TResponse>(
-        this ISetup<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
+        this IReturnsThrows<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
         Func<TResponse> func)
         where T : class
         => Returns(setup, _ => func());
 
     public static IReturnsResult<T> Returns<T, TRequest, TResponse>(
-        this ISetup<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
+        this IReturnsThrows<T, AsyncClientStreamingCall<TRequest, TResponse>> setup,
         Func<IEnumerable<TRequest>, TResponse> func)
         where T : class
         => setup.ReturnsAsync(func);

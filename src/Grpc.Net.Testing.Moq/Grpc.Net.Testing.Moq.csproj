@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/maximiliysiss/grpc.net.testing.moq</RepositoryUrl>
     <PackageId>Net.Testing.Moq.Grpc</PackageId>
     <Authors>maximiliysiss</Authors>
-    <Version>1.3.1</Version>
+    <Version>1.4.0</Version>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,7 +20,7 @@
     <PackageReference Include="Moq" />
     <PackageReference Include="Grpc" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>

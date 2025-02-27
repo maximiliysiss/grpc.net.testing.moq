@@ -29,6 +29,29 @@ public class AsyncUnaryCallMockExtensionsTests
     }
 
     [Theory, AutoData]
+    public void Simple_ShouldReturnResponseAndCallCallback(TestResponse expectedResponse)
+    {
+        // Arrange
+        var flag = false;
+
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .Setup(c => c.Simple(It.IsAny<TestRequest>(), null, null, default))
+            .Callback(() => flag = true)
+            .Returns(expectedResponse);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var response = client.Simple(new TestRequest());
+
+        // Assert
+        response.Should().BeEquivalentTo(expectedResponse);
+
+        flag.Should().BeTrue();
+    }
+
+    [Theory, AutoData]
     public async Task SimpleAsync_ShouldReturnResponse(TestResponse expectedResponse)
     {
         // Arrange
@@ -44,6 +67,29 @@ public class AsyncUnaryCallMockExtensionsTests
 
         // Assert
         response.Should().BeEquivalentTo(expectedResponse);
+    }
+
+    [Theory, AutoData]
+    public async Task SimpleAsync_ShouldReturnResponseAndCallCallback(TestResponse expectedResponse)
+    {
+        // Arrange
+        var flag = false;
+
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .Setup(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+            .Callback(() => flag = true)
+            .ReturnsAsync(expectedResponse);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var response = await client.SimpleAsync(new TestRequest());
+
+        // Assert
+        response.Should().BeEquivalentTo(expectedResponse);
+
+        flag.Should().BeTrue();
     }
 
     [Theory, AutoData]

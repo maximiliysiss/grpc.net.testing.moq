@@ -8,7 +8,7 @@ namespace Grpc.Net.Testing.Moq.Naming;
 public static class AsyncUnaryCallNamingPolicy
 {
     public static IReturnsResult<T> Returns<T, TResponse>(
-        this ISetup<T, AsyncUnaryCall<TResponse>> setup,
+        this IReturnsThrows<T, AsyncUnaryCall<TResponse>> setup,
         TResponse response)
         where T : class
         => Returns(setup, () => response);
@@ -17,13 +17,13 @@ public static class AsyncUnaryCallNamingPolicy
     /// Use only like `AsyncUnaryCallNamingPolicy.Returns`
     /// </summary>
     public static IReturnsResult<T> Returns<T, TResponse>(
-        this ISetup<T, AsyncUnaryCall<TResponse>> setup,
+        this IReturnsThrows<T, AsyncUnaryCall<TResponse>> setup,
         Func<TResponse> func)
         where T : class
         => Returns<T, object, TResponse>(setup, _ => func());
 
     public static IReturnsResult<T> Returns<T, TRequest, TResponse>(
-        this ISetup<T, AsyncUnaryCall<TResponse>> setup,
+        this IReturnsThrows<T, AsyncUnaryCall<TResponse>> setup,
         Func<TRequest, TResponse> func)
         where T : class
         => setup.ReturnsAsync(func);

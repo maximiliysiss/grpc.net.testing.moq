@@ -272,3 +272,23 @@ var stream = client.SimpleClientServerStream();
 await stream.RequestStream.WriteAsync(new TestRequest(), true);
 var responses = stream.ResponseStream.ReadAllAsync();
 ```
+
+#### 4. Using reactive handling
+
+```c#
+// Creation moq
+var grpcMock = new Mock<TestService.TestServiceClient>();
+var testResponse = new[]{ new TestResponse() };
+
+// Setup and set responses by lambda and requests like args
+grpcMock
+    .Setup(c => c.SimpleClientServerStream(null, null, default))
+    .ReturnsAsync(r => new TestResponse{ Val = r.Val });
+
+var client = grpcMock.Object;
+
+// Call
+var stream = client.SimpleClientServerStream();
+await stream.RequestStream.WriteAsync(new TestRequest(), true);
+var responses = stream.ResponseStream.ReadAllAsync();
+```
