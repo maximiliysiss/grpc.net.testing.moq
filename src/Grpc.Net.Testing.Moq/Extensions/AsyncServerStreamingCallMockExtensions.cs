@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Moq;
+using Moq.Language;
 using Moq.Language.Flow;
 
 namespace Grpc.Net.Testing.Moq.Extensions;
@@ -27,25 +28,37 @@ public static class AsyncServerStreamingCallMockExtensions
         this IReturnsThrows<T, AsyncServerStreamingCall<TResponse>> setup,
         Func<TRequest, IEnumerable<TResponse>> func)
         where T : class
-        => setup.Returns(
-            (TRequest r, Metadata? _, DateTime? _, CancellationToken _) =>
-            {
-                var enumerator = func(r).ToList().GetEnumerator();
+        => setup.Returns((TRequest r, Metadata? _, DateTime? _, CancellationToken _) => SimpleServerStreamingCall(func(r)));
 
-                var responseStream = new Mock<IAsyncStreamReader<TResponse>>(MockBehavior.Strict);
+    public static ISetupSequentialResult<AsyncServerStreamingCall<TResponse>> ReturnsAsync<TResponse>(
+        this ISetupSequentialResult<AsyncServerStreamingCall<TResponse>> setup,
+        params TResponse[] response)
+        => ReturnsAsync(setup, () => response);
 
-                responseStream
-                    .SetupGet(c => c.Current)
-                    .Returns(() => enumerator.Current);
-                responseStream
-                    .Setup(c => c.MoveNext(It.IsAny<CancellationToken>()))
-                    .Returns(() => Task.FromResult(enumerator.MoveNext()));
+    public static ISetupSequentialResult<AsyncServerStreamingCall<TResponse>> ReturnsAsync<TResponse>(
+        this ISetupSequentialResult<AsyncServerStreamingCall<TResponse>> setup,
+        Func<IEnumerable<TResponse>> func)
+        => setup.Returns(() => SimpleServerStreamingCall(func()));
 
-                return new AsyncServerStreamingCall<TResponse>(
-                    responseStream: responseStream.Object,
-                    responseHeadersAsync: Task.FromResult(new Metadata()),
-                    getStatusFunc: () => Status.DefaultSuccess,
-                    getTrailersFunc: () => [],
-                    disposeAction: () => { });
-            });
+    private static AsyncServerStreamingCall<TResponse> SimpleServerStreamingCall<TResponse>(IEnumerable<TResponse> enumerable)
+    {
+        var enumerator = enumerable.ToList().GetEnumerator();
+
+        var responseStream = new Mock<IAsyncStreamReader<TResponse>>(MockBehavior.Strict);
+
+        responseStream
+            .SetupGet(c => c.Current)
+            .Returns(() => enumerator.Current);
+
+        responseStream
+            .Setup(c => c.MoveNext(It.IsAny<CancellationToken>()))
+            .Returns(() => Task.FromResult(enumerator.MoveNext()));
+
+        return new AsyncServerStreamingCall<TResponse>(
+            responseStream: responseStream.Object,
+            responseHeadersAsync: Task.FromResult(new Metadata()),
+            getStatusFunc: () => Status.DefaultSuccess,
+            getTrailersFunc: () => [],
+            disposeAction: () => { });
+    }
 }

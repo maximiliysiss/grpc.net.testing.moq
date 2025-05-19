@@ -23,7 +23,7 @@ Based on libraries:
 
 #### 1. Call with exists response
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 
@@ -42,7 +42,7 @@ var response = client.Simple(new TestRequest());
 
 #### 1. Call with exists response
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new TestResponse();
@@ -60,7 +60,7 @@ var response = await client.SimpleAsync(new TestRequest());
 
 #### 2. Call with response creating on call
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 
@@ -77,7 +77,7 @@ var response = client.SimpleAsync(new TestRequest());
 
 #### 3. Call with response creating on call and based on request
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 
@@ -92,11 +92,30 @@ var client = grpcMock.Object;
 var response = client.SimpleAsync(new TestRequest());
 ```
 
+#### 4. Call with sequential results
+
+```csharp
+// Creation moq
+var grpcMock = new Mock<TestService.TestServiceClient>();
+
+// Setup
+grpcMock
+    .SetupSequence(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+    .ReturnsAsync(firstExpectedResponse)
+    .ReturnsAsync(secondExpectedResponse);
+
+var client = grpcMock.Object;
+
+// Call
+var firstResponse = await client.SimpleAsync(new TestRequest());
+var secondResponse = await client.SimpleAsync(new TestRequest());
+```
+
 ### Simple client stream calling:
 
 #### 1. Call with exists response
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new TestResponse();
@@ -116,7 +135,7 @@ var response = await stream;
 
 #### 2. Call with response creating on call
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new TestResponse();
@@ -136,7 +155,7 @@ var response = await stream;
 
 #### 3. Call with response creating on call and based on request
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 
@@ -153,11 +172,37 @@ await stream.RequestStream.WriteAllAsync(new[] {new TestRequest()}, true);
 var response = await stream;
 ```
 
+#### 4. Call with sequential results
+
+```csharp
+// Creation moq
+var grpcMock = new Mock<TestService.TestServiceClient>();
+
+// Setup
+grpcMock
+    .SetupSequence(c => c.SimpleClientStream(null, null, default))
+    .ReturnsAsync(firstExpectedResponses)
+    .ReturnsAsync(secondExpectedResponses);
+
+var client = grpcMock.Object;
+
+// Call
+var firstCall = client.SimpleClientStream();
+await firstCall.RequestStream.CompleteAsync();
+
+var firstMessage = await firstCall;
+
+var secondCall = client.SimpleClientStream();
+await secondCall.RequestStream.CompleteAsync();
+
+var secondMessage = await secondCall;
+```
+
 ### Simple server stream calling:
 
 #### 1. Call with exists response
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new[]{ new TestResponse() };
@@ -176,7 +221,7 @@ var responses = stream.ResponseStream.ReadAllAsync();
 
 #### 2. Call with response creating on call
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new[]{ new TestResponse() };
@@ -195,7 +240,7 @@ var responses = stream.ResponseStream.ReadAllAsync();
 
 #### 3. Call with response creating on call and based on request
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 
@@ -211,11 +256,30 @@ var stream = client.SimpleServerStream(new TestRequest());
 var responses = stream.ResponseStream.ReadAllAsync();
 ```
 
+#### 4. Call with sequential results
+
+```csharp
+// Creation moq
+var grpcMock = new Mock<TestService.TestServiceClient>();
+
+// Setup
+grpcMock
+    .SetupSequence(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+    .ReturnsAsync(firstExpectedResponses)
+    .ReturnsAsync(secondExpectedResponses);
+
+var client = grpcMock.Object;
+
+// Call
+var firstMessages = await client.SimpleServerStream(new TestRequest()).ResponseStream.ReadAllAsync().ToArrayAsync();
+var secondMessages = await client.SimpleServerStream(new TestRequest()).ResponseStream.ReadAllAsync().ToArrayAsync();
+```
+
 ### Simple client server streams calling:
 
 #### 1. Call with exists response
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new[]{ new TestResponse() };
@@ -235,7 +299,7 @@ var responses = stream.ResponseStream.ReadAllAsync();
 
 #### 2. Call with response creating on call
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new[]{ new TestResponse() };
@@ -255,7 +319,7 @@ var responses = stream.ResponseStream.ReadAllAsync();
 
 #### 3. Call with response creating on call and based on request
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new[]{ new TestResponse() };
@@ -275,7 +339,7 @@ var responses = stream.ResponseStream.ReadAllAsync();
 
 #### 4. Using reactive handling
 
-```c#
+```csharp
 // Creation moq
 var grpcMock = new Mock<TestService.TestServiceClient>();
 var testResponse = new[]{ new TestResponse() };
@@ -291,4 +355,34 @@ var client = grpcMock.Object;
 var stream = client.SimpleClientServerStream();
 await stream.RequestStream.WriteAsync(new TestRequest(), true);
 var responses = stream.ResponseStream.ReadAllAsync();
+```
+
+#### 5. Call with sequential results
+
+```csharp
+// Creation moq
+var grpcMock = new Mock<TestService.TestServiceClient>();
+
+// Setup
+grpcMock
+    .SetupSequence(c => c.SimpleClientServerStream(null, null, default))
+    .ReturnsAsync(firstExpectedResponses)
+    .ReturnsAsync(secondExpectedResponses);
+
+var client = grpcMock.Object;
+
+// Call
+var firstCall = client.SimpleClientServerStream();
+await firstCall.RequestStream.CompleteAsync();
+
+var firstMessages = await firstCall.ResponseStream
+    .ReadAllAsync()
+    .ToArrayAsync();
+
+var secondCall = client.SimpleClientServerStream();
+await secondCall.RequestStream.CompleteAsync();
+
+var secondMessages = await secondCall.ResponseStream
+    .ReadAllAsync()
+    .ToArrayAsync();
 ```

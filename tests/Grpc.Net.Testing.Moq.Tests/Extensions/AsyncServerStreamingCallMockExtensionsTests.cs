@@ -33,6 +33,48 @@ public class AsyncServerStreamingCallMockExtensionsTests
     }
 
     [Theory, AutoData]
+    public async Task SimpleServer_ShouldReturnResponse_Sequential(TestResponse[] firstExpectedResponses, TestResponse[] secondExpectedResponses)
+    {
+        // Arrange
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .SetupSequence(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+            .ReturnsAsync(firstExpectedResponses)
+            .ReturnsAsync(secondExpectedResponses);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var firstMessages = await client.SimpleServerStream(new TestRequest()).ResponseStream.ReadAllAsync().ToArrayAsync();
+        var secondMessages = await client.SimpleServerStream(new TestRequest()).ResponseStream.ReadAllAsync().ToArrayAsync();
+
+        // Assert
+        firstMessages.Should().BeEquivalentTo(firstExpectedResponses);
+        secondMessages.Should().BeEquivalentTo(secondExpectedResponses);
+    }
+
+    [Theory, AutoData]
+    public async Task SimpleServer_ShouldReturnResponse_SequentialByFunc(TestResponse[] firstExpectedResponses, TestResponse[] secondExpectedResponses)
+    {
+        // Arrange
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .SetupSequence(c => c.SimpleServerStream(It.IsAny<TestRequest>(), null, null, default))
+            .ReturnsAsync(() => firstExpectedResponses)
+            .ReturnsAsync(() => secondExpectedResponses);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var firstMessages = await client.SimpleServerStream(new TestRequest()).ResponseStream.ReadAllAsync().ToArrayAsync();
+        var secondMessages = await client.SimpleServerStream(new TestRequest()).ResponseStream.ReadAllAsync().ToArrayAsync();
+
+        // Assert
+        firstMessages.Should().BeEquivalentTo(firstExpectedResponses);
+        secondMessages.Should().BeEquivalentTo(secondExpectedResponses);
+    }
+
+    [Theory, AutoData]
     public async Task SimpleServer_ShouldReturnResponseAndCallback(TestResponse[] expectedResponses)
     {
         // Arrange

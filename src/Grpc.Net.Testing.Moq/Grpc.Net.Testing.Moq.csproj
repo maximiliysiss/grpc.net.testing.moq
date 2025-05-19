@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/maximiliysiss/grpc.net.testing.moq</RepositoryUrl>
     <PackageId>Net.Testing.Moq.Grpc</PackageId>
     <Authors>maximiliysiss</Authors>
-    <Version>1.4.0</Version>
+    <Version>1.5.0</Version>
   </PropertyGroup>
 
   <PropertyGroup>

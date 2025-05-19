@@ -70,6 +70,48 @@ public class AsyncUnaryCallMockExtensionsTests
     }
 
     [Theory, AutoData]
+    public async Task SimpleAsync_ShouldReturnResponse_Sequential(TestResponse firstExpectedResponse, TestResponse secondExpectedResponse)
+    {
+        // Arrange
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .SetupSequence(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+            .ReturnsAsync(firstExpectedResponse)
+            .ReturnsAsync(secondExpectedResponse);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var firstResponse = await client.SimpleAsync(new TestRequest());
+        var secondResponse = await client.SimpleAsync(new TestRequest());
+
+        // Assert
+        firstResponse.Should().BeEquivalentTo(firstExpectedResponse);
+        secondResponse.Should().BeEquivalentTo(secondExpectedResponse);
+    }
+
+    [Theory, AutoData]
+    public async Task SimpleAsync_ShouldReturnResponse_SequentialByFunc(TestResponse firstExpectedResponse, TestResponse secondExpectedResponse)
+    {
+        // Arrange
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .SetupSequence(c => c.SimpleAsync(It.IsAny<TestRequest>(), null, null, default))
+            .ReturnsAsync(() => firstExpectedResponse)
+            .ReturnsAsync(() => secondExpectedResponse);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var firstResponse = await client.SimpleAsync(new TestRequest());
+        var secondResponse = await client.SimpleAsync(new TestRequest());
+
+        // Assert
+        firstResponse.Should().BeEquivalentTo(firstExpectedResponse);
+        secondResponse.Should().BeEquivalentTo(secondExpectedResponse);
+    }
+
+    [Theory, AutoData]
     public async Task SimpleAsync_ShouldReturnResponseAndCallCallback(TestResponse expectedResponse)
     {
         // Arrange

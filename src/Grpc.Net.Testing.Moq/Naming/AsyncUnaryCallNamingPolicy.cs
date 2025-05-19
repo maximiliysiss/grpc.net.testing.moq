@@ -1,6 +1,7 @@
 using System;
 using Grpc.Core;
 using Grpc.Net.Testing.Moq.Extensions;
+using Moq.Language;
 using Moq.Language.Flow;
 
 namespace Grpc.Net.Testing.Moq.Naming;
@@ -26,5 +27,15 @@ public static class AsyncUnaryCallNamingPolicy
         this IReturnsThrows<T, AsyncUnaryCall<TResponse>> setup,
         Func<TRequest, TResponse> func)
         where T : class
+        => setup.ReturnsAsync(func);
+
+    public static ISetupSequentialResult<AsyncUnaryCall<TResponse>> Returns<TResponse>(
+        this ISetupSequentialResult<AsyncUnaryCall<TResponse>> setup,
+        TResponse response)
+        => setup.ReturnsAsync(response);
+
+    public static ISetupSequentialResult<AsyncUnaryCall<TResponse>> Returns<TResponse>(
+        this ISetupSequentialResult<AsyncUnaryCall<TResponse>> setup,
+        Func<TResponse> func)
         => setup.ReturnsAsync(func);
 }

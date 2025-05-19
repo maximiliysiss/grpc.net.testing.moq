@@ -35,6 +35,90 @@ public class AsyncClientStreamingCallMockExtensionsTests
     }
 
     [Theory, AutoData]
+    public async Task SimpleServer_ShouldReturnResponse_Sequential(TestResponse firstExpectedResponses, TestResponse secondExpectedResponses)
+    {
+        // Arrange
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .SetupSequence(c => c.SimpleClientStream(null, null, default))
+            .ReturnsAsync(firstExpectedResponses)
+            .ReturnsAsync(secondExpectedResponses);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var firstCall = client.SimpleClientStream();
+        await firstCall.RequestStream.CompleteAsync();
+
+        var firstMessage = await firstCall;
+
+        var secondCall = client.SimpleClientStream();
+        await secondCall.RequestStream.CompleteAsync();
+
+        var secondMessage = await secondCall;
+
+        // Assert
+        firstMessage.Should().BeEquivalentTo(firstExpectedResponses);
+        secondMessage.Should().BeEquivalentTo(secondExpectedResponses);
+    }
+
+    [Theory, AutoData]
+    public async Task SimpleServer_ShouldReturnResponse_SequentialByFunc(TestResponse firstExpectedResponses, TestResponse secondExpectedResponses)
+    {
+        // Arrange
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .SetupSequence(c => c.SimpleClientStream(null, null, default))
+            .ReturnsAsync(() => firstExpectedResponses)
+            .ReturnsAsync(() => secondExpectedResponses);
+
+        var client = grpcMock.Object;
+
+        // Act
+        var firstCall = client.SimpleClientStream();
+        await firstCall.RequestStream.CompleteAsync();
+
+        var firstMessage = await firstCall;
+
+        var secondCall = client.SimpleClientStream();
+        await secondCall.RequestStream.CompleteAsync();
+
+        var secondMessage = await secondCall;
+
+        // Assert
+        firstMessage.Should().BeEquivalentTo(firstExpectedResponses);
+        secondMessage.Should().BeEquivalentTo(secondExpectedResponses);
+    }
+
+    [Theory, AutoData]
+    public async Task SimpleServer_ShouldReturnResponse_SequentialByLambda(TestRequest[] firstRequests, TestRequest[] secondRequests)
+    {
+        // Arrange
+        var grpcMock = new Mock<TestService.TestServiceClient>();
+        grpcMock
+            .SetupSequence(c => c.SimpleClientStream(null, null, default))
+            .ReturnsAsync(rs => new TestResponse { Val = rs.Sum(c => c.Val) })
+            .ReturnsAsync(rs => new TestResponse { Val = rs.Sum(c => c.Val) * 2 });
+
+        var client = grpcMock.Object;
+
+        // Act
+        var firstCall = client.SimpleClientStream();
+        await firstCall.RequestStream.WriteAllAsync(firstRequests);
+
+        var firstMessage = await firstCall;
+
+        var secondCall = client.SimpleClientStream();
+        await secondCall.RequestStream.WriteAllAsync(secondRequests);
+
+        var secondMessage = await secondCall;
+
+        // Assert
+        firstMessage.Should().BeEquivalentTo(new TestResponse { Val = firstRequests.Sum(c => c.Val) });
+        secondMessage.Should().BeEquivalentTo(new TestResponse { Val = secondRequests.Sum(c => c.Val) * 2 });
+    }
+
+    [Theory, AutoData]
     public async Task SimpleServer_ShouldReturnResponseAndCallback(TestResponse expectedResponses)
     {
         // Arrange

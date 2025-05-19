@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Grpc.Core;
 using Grpc.Net.Testing.Moq.Extensions;
+using Moq.Language;
 using Moq.Language.Flow;
 
 namespace Grpc.Net.Testing.Moq.Naming;
@@ -27,5 +28,15 @@ public static class AsyncServerStreamingCallNamingPolicy
         this IReturnsThrows<T, AsyncServerStreamingCall<TResponse>> setup,
         Func<TRequest, IEnumerable<TResponse>> func)
         where T : class
+        => setup.ReturnsAsync(func);
+
+    public static ISetupSequentialResult<AsyncServerStreamingCall<TResponse>> Returns<TResponse>(
+        this ISetupSequentialResult<AsyncServerStreamingCall<TResponse>> setup,
+        params TResponse[] response)
+        => setup.ReturnsAsync(response);
+
+    public static ISetupSequentialResult<AsyncServerStreamingCall<TResponse>> Returns<TResponse>(
+        this ISetupSequentialResult<AsyncServerStreamingCall<TResponse>> setup,
+        Func<IEnumerable<TResponse>> func)
         => setup.ReturnsAsync(func);
 }
