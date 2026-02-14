@@ -1,5 +1,7 @@
 # grpc.net.testing.moq
 
+[![NuGet](https://img.shields.io/nuget/v/Net.Testing.Moq.Grpc.svg)](https://www.nuget.org/packages/Net.Testing.Moq.Grpc/)
+[![NuGet](https://img.shields.io/nuget/dt/Net.Testing.Moq.Grpc.svg)](https://www.nuget.org/packages/Net.Testing.Moq.Grpc/)
 [![.NET](https://github.com/maximiliysiss/grpc.net.testing.moq/actions/workflows/dotnet.yml/badge.svg?branch=master&event=push)](https://github.com/maximiliysiss/grpc.net.testing.moq/actions/workflows/dotnet.yml)
 
 Library to mocking gRPC client. Instead of `Grpc.Core.Testing` using extensions for `Moq`
